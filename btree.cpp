@@ -1,17 +1,7 @@
 #include "btree.h"
 
-// YZEL ============================================================================
-
 BNode::BNode(int k, bool leaf)
     : K(k), isLeaf(leaf) {}
-
-int BNode::findKey(int k) const {
-    int idx = 0;
-    while (idx < static_cast<int>(keys.size()) && keys[idx] < k) {
-        idx++;
-    }
-    return idx;
-}
 
 void BNode::insertNonFull(int key) {
     int i = keys.size() - 1;
@@ -51,7 +41,7 @@ void BNode::splitChild(int i) {
     if (!left->isLeaf) {
         right->children.assign(left->children.begin() + K, left->children.end());
         left->children.erase(left->children.begin() + K, left->children.end());
-    } // Если не лист, копируем детей
+    }
     
     // Поднять средний ключ в родителя
     keys.insert(keys.begin() + i, left->keys.back());
@@ -61,18 +51,11 @@ void BNode::splitChild(int i) {
     children.insert(children.begin() + i + 1, right);
 }
 
-void BNode::insertLeaf(int key) {
-    keys.push_back(key);
-    std::sort(keys.begin(), keys.end());
-}
-
 void BNode::print() const {
     for (int key : keys) {
         std::cout << key << " ";
     }
 }
-
-// DEREVO =======================================================
 
 BTree::BTree(int k)
     : K(k), nodeCount(1) {
@@ -90,9 +73,8 @@ void BTree::insert(int key) {
     }
     
     root->insertNonFull(key);
-    
     nodeCount = 0;
-    countNodes(root, nodeCount); // обновить количество узлов
+    countNodes(root, nodeCount);
 }
 
 bool BTree::search(int key) const {
@@ -165,8 +147,6 @@ void BTree::countNodes(const std::shared_ptr<BNode>& node, int& count) const {
 }
 
 
-
-// TRANSFORMER (STATIC) ======================================================
 
 std::shared_ptr<BTree> BTreeTransformer::transform(const std::shared_ptr<BTree>& tree, int K2) {
     // Собрать все ключи в отсортированный массив - O(m)

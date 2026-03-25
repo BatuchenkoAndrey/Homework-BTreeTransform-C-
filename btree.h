@@ -4,52 +4,46 @@
 #include <vector>
 #include <memory>
 #include <iostream>
-#include <algorithm>
 
-// Узел B-дерева
 class BNode {
 public:
     int K;  // Степень дерева
-    std::vector<int> keys;  // Ключи в узле
-    std::vector<std::shared_ptr<BNode>> children;  // Указатели на детей
-    bool isLeaf;  // Листовой ли узел
+    std::vector<int> keys;  
+    std::vector<std::shared_ptr<BNode>> children;
+    bool isLeaf;
     
     BNode(int k, bool leaf = true);
     
-
-    int findKey(int k) const;  // Найти позицию ключа, куда нужно его вставить
-    void insertNonFull(int key);  // Вставить ключ в незаполненный узел
-    void splitChild(int i);  // Разделить потомка
-    void insertLeaf(int key);  // Вставить ключ в листовой узел
-    void removeKey(int key);  // Удалить ключ
+    void insertNonFull(int key); 
+    void splitChild(int i);
     
-    void print() const;  // Вывод узла
+    void print() const;
 };
 
-// B-дерево
+
 class BTree {
 public:
-    std::shared_ptr<BNode> root;  // Корень дерева
+    std::shared_ptr<BNode> root;
     int K;  // Степень дерева
-    int nodeCount;  // Количество узлов в дереве
+    int nodeCount;  
     
     BTree(int k);
     ~BTree() = default;
     
-    void insert(int key);  // Вставить ключ
-    bool search(int key) const;  // Поиск ключа
-    void inOrderTraversal(std::vector<int>& result, const std::shared_ptr<BNode>& node = nullptr) const;  // In-order обход
+    void insert(int key);  
+    bool search(int key) const;  
+    void inOrderTraversal(std::vector<int>& result, const std::shared_ptr<BNode>& node = nullptr) const;
     
     int getK() const { return K; }
     int getNodeCount() const { return nodeCount; } 
     
-    void printTree(const std::shared_ptr<BNode>& node = nullptr, int indent = 0) const;  // Вывод дерева
+    void printTree(const std::shared_ptr<BNode>& node = nullptr, int indent = 0) const;
     
-    // подсчёт узлов
+  
     void countNodes(const std::shared_ptr<BNode>& node, int& count) const;
 };
 
-//  Преобразование
+
 class BTreeTransformer {
 public:
     static std::shared_ptr<BTree> transform(const std::shared_ptr<BTree>& tree, int K2);
