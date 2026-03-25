@@ -14,7 +14,7 @@ protected:
         std::vector<int> original_keys;
         tree1->inOrderTraversal(original_keys);
         
-        auto tree2 = BTreeTransformer::transform(tree1, K2);
+        auto tree2 = tree1->transform(K2);
         
         std::vector<int> transformed_keys;
         tree2->inOrderTraversal(transformed_keys);
@@ -239,6 +239,86 @@ TEST_F(BTreeTest, Integration_TransformWithLargeDataset) {
     verifyTransformation(keys, 3, 2);
     verifyTransformation(keys, 3, 4);
     verifyTransformation(keys, 3, 5);
+}
+
+// ============ HEAVY LOAD TESTS ============
+
+TEST_F(BTreeTest, HeavyLoad_Insert10000Keys) {
+    auto tree = std::make_shared<BTree>(4);
+    
+    for (int i = 1; i <= 10000; i++) {
+        tree->insert(i);
+    }
+    
+    std::vector<int> result;
+    tree->inOrderTraversal(result);
+    
+    EXPECT_EQ(result.size(), 10000);
+    EXPECT_EQ(result.front(), 1);
+    EXPECT_EQ(result.back(), 10000);
+    
+    // Проверка что все элементы на месте
+    for (int i = 1; i <= 10000; i++) {
+        EXPECT_TRUE(tree->search(i));
+    }
+}
+
+TEST_F(BTreeTest, HeavyLoad_Transform10000Keys) {
+    auto tree1 = std::make_shared<BTree>(3);
+    
+    // Вставляем 10000 ключей
+    for (int i = 1; i <= 10000; i++) {
+        tree1->insert(i);
+    }
+    
+    // Трансформируем несколько раз
+    auto tree2 = tree1->transform(2);
+    auto tree3 = tree2->transform(5);
+    auto tree4 = tree3->transform(3);
+    
+    std::vector<int> keys1, keys2, keys3, keys4;
+    tree1->inOrderTraversal(keys1);
+    tree2->inOrderTraversal(keys2);
+    tree3->inOrderTraversal(keys3);
+    tree4->inOrderTraversal(keys4);
+    
+    EXPECT_EQ(keys1, keys2);
+    EXPECT_EQ(keys2, keys3);
+    EXPECT_EQ(keys3, keys4);
+}
+
+TEST_F(BTreeTest, HeavyLoad_SearchMany) {
+    auto tree = std::make_shared<BTree>(5);
+    
+    for (int i = 1; i <= 5000; i++) {
+        tree->insert(i);
+    }
+    
+    // Ищем много элементов
+    for (int i = 1; i <= 5000; i++) {
+        EXPECT_TRUE(tree->search(i));
+    }
+    
+    // Ищем несуществующие элементы
+    for (int i = 5001; i <= 10000; i++) {
+        EXPECT_FALSE(tree->search(i));
+    }
+}
+
+TEST_F(BTreeTest, HeavyLoad_ReverseInsert) {
+    auto tree = std::make_shared<BTree>(4);
+    
+    // Вставляем в обратном порядке
+    for (int i = 10000; i >= 1; i--) {
+        tree->insert(i);
+    }
+    
+    std::vector<int> result;
+    tree->inOrderTraversal(result);
+    
+    EXPECT_EQ(result.size(), 10000);
+    EXPECT_EQ(result.front(), 1);
+    EXPECT_EQ(result.back(), 10000);
 }
 
 // ============ MAIN С ФИНАЛЬНЫМ ВЫВОДОМ ============

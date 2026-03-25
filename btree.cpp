@@ -63,7 +63,6 @@ BTree::BTree(int k)
 }
 
 void BTree::insert(int key) {
-    // Если корень полон, разделить его
     if (static_cast<int>(root->keys.size()) == 2 * K - 1) {
         auto newRoot = std::make_shared<BNode>(K, false);
         newRoot->children.push_back(root);
@@ -110,7 +109,7 @@ void BTree::inOrderTraversal(std::vector<int>& result, const std::shared_ptr<BNo
             result.push_back(key);
         }
     } else {
-        // Для внутреннего узла чередуем детей и ключи
+        // Не лист, значит чередуем детей и значения
         for (int i = 0; i < static_cast<int>(current->keys.size()); i++) {
             inOrderTraversal(result, current->children[i]);
             result.push_back(current->keys[i]);
@@ -146,14 +145,10 @@ void BTree::countNodes(const std::shared_ptr<BNode>& node, int& count) const {
     }
 }
 
-
-
-std::shared_ptr<BTree> BTreeTransformer::transform(const std::shared_ptr<BTree>& tree, int K2) {
-    // Собрать все ключи в отсортированный массив - O(m)
+std::shared_ptr<BTree> BTree::transform(int K2) const {
     std::vector<int> keys;
-    collectKeys(tree->root, keys);
+    inOrderTraversal(keys);
     
-    // Построить новое дерево из массива - O(m)
     auto newTree = std::make_shared<BTree>(K2);
 
     for (int key : keys) {
@@ -163,19 +158,16 @@ std::shared_ptr<BTree> BTreeTransformer::transform(const std::shared_ptr<BTree>&
     return newTree;
 }
 
-void BTreeTransformer::collectKeys(const std::shared_ptr<BNode>& node, std::vector<int>& keys) {
-    if (!node) return;
-    
-    if (node->isLeaf) {
-        for (int key : node->keys) {
-            keys.push_back(key);
-        }
-    } else {
-        int i = 0;
-        for (; i < static_cast<int>(node->keys.size()); i++) {
-            collectKeys(node->children[i], keys);
-            keys.push_back(node->keys[i]);
-        }
-        collectKeys(node->children[i], keys);
-    }
-}
+
+/*
+Трансформация T(n):
+
+T(n) = inOrderTraversal(n)      + insertAll(n)
+     = O(n)               + O(n)
+     = O(n) ✓
+
+Где:
+  inOrderTraversal(n) = O(n) — каждый ключ копируется один раз
+  insertAll(n)   = O(n) — амортизированно, благодаря отсортированности
+*/
+

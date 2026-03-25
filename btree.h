@@ -34,6 +34,8 @@ public:
     bool search(int key) const;  
     void inOrderTraversal(std::vector<int>& result, const std::shared_ptr<BNode>& node = nullptr) const;
     
+    std::shared_ptr<BTree> transform(int K2) const;  // Трансформировать в дерево с новой степенью
+    
     int getK() const { return K; }
     int getNodeCount() const { return nodeCount; } 
     
@@ -41,15 +43,6 @@ public:
     
   
     void countNodes(const std::shared_ptr<BNode>& node, int& count) const;
-};
-
-
-class BTreeTransformer {
-public:
-    static std::shared_ptr<BTree> transform(const std::shared_ptr<BTree>& tree, int K2);
-    
-private:
-    static void collectKeys(const std::shared_ptr<BNode>& node, std::vector<int>& keys);
 };
 
 #endif

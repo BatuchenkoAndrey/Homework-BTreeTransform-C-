@@ -20,26 +20,15 @@ int main() {
 
     int K2 = 2;
     std::cout << "\nK = " << K2 << "\n";
-    auto tree2 = BTreeTransformer::transform(tree1, K2);
+    auto tree2 = tree1->transform(K2);
     tree2->printTree();
     
 
     int K3 = 5;
     std::cout << "\nK = " << K3 << "\n";
-    auto tree3 = BTreeTransformer::transform(tree1, K3);
+    auto tree3 = tree1->transform(K3);
     tree3->printTree();
     
     return 0;
 }
 
-/*
-Трансформация T(n):
-
-T(n) = collectKeys(n)      + insertAll(n)
-     = O(n)               + O(n)
-     = O(n) ✓
-
-Где:
-  collectKeys(n) = O(n) — каждый ключ копируется один раз
-  insertAll(n)   = O(n) — амортизированно, благодаря отсортированности
-*/
